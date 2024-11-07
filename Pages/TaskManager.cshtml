@@ -1,0 +1,102 @@
+﻿@page
+@model Task_Management_System.Pages.TaskManagerModel
+@{
+    ViewData["Title"] = "Task Manager";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Bootstrap Tabs for switching between Task Form and Task List -->
+<ul class="nav nav-tabs" id="taskTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="taskForm-tab" data-bs-toggle="tab" data-bs-target="#taskForm" type="button" role="tab" aria-controls="taskForm" aria-selected="true">Add Task</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="taskList-tab" data-bs-toggle="tab" data-bs-target="#taskList" type="button" role="tab" aria-controls="taskList" aria-selected="false">Task List</button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content mt-3" id="taskTabContent">
+    <!-- Task Form Tab -->
+    <div class="tab-pane fade show active" id="taskForm" role="tabpanel" aria-labelledby="taskForm-tab">
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Task.Name" class="form-label"></label>
+                <input asp-for="Task.Name" class="form-control" />
+                <span asp-validation-for="Task.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Task.Description" class="form-label"></label>
+                <input asp-for="Task.Description" class="form-control" />
+                <span asp-validation-for="Task.Description" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Task.DueDate" class="form-label"></label>
+                <input asp-for="Task.DueDate" type="date" class="form-control" />
+                <span asp-validation-for="Task.DueDate" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Task.Priority" class="form-label"></label>
+                <select asp-for="Task.Priority" class="form-select">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+                <span asp-validation-for="Task.Priority" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+    </div>
+
+    <!-- Task List Tab -->
+    <div class="tab-pane fade" id="taskList" role="tabpanel" aria-labelledby="taskList-tab">
+        <h3 class="mt-4">Tasks</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Completed</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Tasks != null && Model.Tasks.Count > 0)
+                {
+                    foreach (var task in Model.Tasks)
+                    {
+                        <tr>
+                            <td>@task.Name</td>
+                            <td>@task.Description</td>
+                            <td>@task.DueDate.ToShortDateString()</td>
+                            <td>@task.Priority</td>
+                            <td>
+                                <form method="post" asp-page-handler="ToggleComplete" asp-route-id="@task.Id">
+                                    <input type="checkbox" @(task.IsCompleted ? "checked" : "") onchange="this.form.submit()" />
+                                </form>
+                            </td>
+                            <td>
+                                <form method="post" asp-page-handler="Edit" asp-route-id="@task.Id">
+                                    <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                </form>
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@task.Id" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No tasks available.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
